@@ -1,7 +1,6 @@
 package com.example.mathsapp.viewmodel
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,11 +20,15 @@ class MainViewModel @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
 
+    /** Keeps the value of evaluated answer as a State which is used to display result to users. */
     val evaluatedAnswers: MutableState<String> = mutableStateOf("")
 
     private val _errorLiveData: MutableLiveData<String> = MutableLiveData("")
+
+    /** [LiveData] for the errors received in API responses. Helps showing toast to the users. */
     val errorLiveData: LiveData<String> = _errorLiveData
 
+    /** For keeping the list of previous expression evaluations fetched from database. */
     val results: MutableState<List<ResultExpr>> = mutableStateOf(emptyList())
 
     init {
@@ -56,7 +59,12 @@ class MainViewModel @Inject constructor(
     private fun insertIntoDataBase(exprAndAnswerString: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val dateAndTime = Calendar.getInstance().time.time
-            repository.insertResult(ResultExpr(value = exprAndAnswerString, dateAndTime = dateAndTime))
+            repository.insertResult(
+                ResultExpr(
+                    value = exprAndAnswerString,
+                    dateAndTime = dateAndTime
+                )
+            )
             refreshList()
         }
     }
